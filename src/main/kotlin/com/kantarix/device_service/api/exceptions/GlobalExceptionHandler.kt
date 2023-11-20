@@ -22,23 +22,23 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidationException(ex: MethodArgumentNotValidException): ResponseEntity<ErrorDto> {
-        val allErrors = ex.bindingResult.allErrors
+        val allErrors = ex.bindingResult.fieldErrors
         val errorMessages = mutableListOf<String>()
 
         for (error in allErrors)
-            error.defaultMessage?.let { errorMessages.add(it) }
+            errorMessages.add("${error.field.removePrefix("_")} ${error.defaultMessage}")
 
         return ResponseEntity.badRequest().body(
             ErrorDto(code = "VALIDATION_EXCEPTION", messages = errorMessages)
         )
     }
 
-    @ExceptionHandler(Exception::class)
-    fun handleException(ex: Exception): ResponseEntity<ErrorDto> {
-        log.debug(ex) { ex.message }
-        return ResponseEntity.badRequest().body(
-            ErrorDto(code = "INTERNAL_API_EXCEPTION", messages = listOf("Something went wrong."))
-        )
-    }
+//    @ExceptionHandler(Exception::class)
+//    fun handleException(ex: Exception): ResponseEntity<ErrorDto> {
+//        log.debug(ex) { ex.message }
+//        return ResponseEntity.badRequest().body(
+//            ErrorDto(code = "INTERNAL_API_EXCEPTION", messages = listOf("Something went wrong."))
+//        )
+//    }
 
 }

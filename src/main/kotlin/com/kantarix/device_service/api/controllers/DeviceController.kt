@@ -5,6 +5,7 @@ import com.kantarix.device_service.api.dto.DeviceSimple
 import com.kantarix.device_service.api.dto.request.DeviceCapabilitiesRequest
 import com.kantarix.device_service.api.dto.request.DeviceRequest
 import com.kantarix.device_service.api.dto.request.TuyaDeviceRequest
+import com.kantarix.device_service.api.services.DeviceService
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -27,7 +28,7 @@ class DeviceController(
     @GetMapping("/{deviceId}")
     fun getDevice(
         @PathVariable("deviceId") deviceId: Int,
-    ): Device = deviceService.getDevice(deviceId)
+    ) = deviceService.getDevice(deviceId)
 
     @PostMapping
     fun createDevice(

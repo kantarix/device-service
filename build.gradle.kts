@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
 	id("org.springframework.boot") version "2.7.17"
@@ -17,6 +18,7 @@ java {
 
 repositories {
 	mavenCentral()
+	maven { url = uri("https://maven-other.tuya.com/repository/maven-public/") }
 }
 
 dependencies {
@@ -25,10 +27,14 @@ dependencies {
 	 */
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
-	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+	/**
+	 * Tuya
+	 */
+	implementation("com.tuya:tuya-spring-boot-starter:1.3.2")
 
 	/**
 	 * Other
@@ -54,6 +60,18 @@ tasks.withType<KotlinCompile> {
 		freeCompilerArgs += "-Xjsr305=strict"
 		jvmTarget = "17"
 	}
+}
+
+sourceSets.main {
+	java.srcDirs("src/main/kotlin")
+}
+
+tasks.withType<BootRun> {
+	jvmArgs(
+		"--add-opens=java.base/java.lang=ALL-UNNAMED",
+		"--add-opens=java.management/sun.management=ALL-UNNAMED",
+		"--add-opens=java.base/sun.net=ALL-UNNAMED",
+	)
 }
 
 tasks.withType<Test> {

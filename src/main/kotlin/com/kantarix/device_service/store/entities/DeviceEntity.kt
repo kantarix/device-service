@@ -4,11 +4,13 @@ import com.kantarix.device_service.api.dto.Device
 import com.kantarix.device_service.api.dto.DeviceSimple
 import com.kantarix.device_service.api.dto.category.Category
 import javax.persistence.Entity
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
-import javax.persistence.OneToMany
+import javax.persistence.OneToOne
 import javax.persistence.Table
 
 @Entity
@@ -21,10 +23,11 @@ class DeviceEntity(
 
     val name: String,
 
+    @Enumerated(EnumType.STRING)
     val category: Category,
 
-    @OneToMany(mappedBy = "device", targetEntity = CapabilityEntity::class, fetch = FetchType.LAZY)
-    var capabilities: List<CapabilityEntity>? = null,
+    @OneToOne(mappedBy = "device", targetEntity = CapabilityEntity::class, fetch = FetchType.LAZY)
+    var capabilities: CapabilityEntity,
 
     ) {
     fun toDeviceDto() =
@@ -32,7 +35,7 @@ class DeviceEntity(
             id = id,
             name = name,
             category = category.value,
-            capabilities = capabilities?.map { it.toCapabilityDto() } ?: emptyList()
+            capabilities = capabilities.toCapabilitiesList(),
         )
 
     fun toDeviceSimpleDto() =

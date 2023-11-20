@@ -4,17 +4,21 @@
 
 create table devices
 (
-    id                  int not null generated always as identity,
-    name                varchar not null,
-    category            varchar not null,
+    id                      int not null generated always as identity,
+    name                    varchar not null,
+    category                varchar not null,
     primary key (id)
 );
 
 create table capabilities
 (
-    id                  int not null generated always as identity,
-    code                varchar not null,
-    value               varchar not null,
-    device              int not null references devices on delete cascade,
-    primary key (id)
+    device_id               int not null unique references devices(id) on delete cascade,
+    switch_led              boolean not null,
+    work_mode               varchar not null,
+    temperature             int not null,
+    brightness              int not null,
+    color_hue               int,
+    color_saturation        int,
+    color_value             int,
+    primary key (device_id)
 );
