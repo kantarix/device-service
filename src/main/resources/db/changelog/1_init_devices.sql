@@ -5,6 +5,7 @@
 create table devices
 (
     id                      int not null generated always as identity,
+    tuya_id                 varchar not null unique,
     name                    varchar not null,
     category                varchar not null,
     primary key (id)
@@ -12,7 +13,7 @@ create table devices
 
 create table capabilities
 (
-    device_id               int not null unique references devices(id) on delete cascade,
+    device_id               int not null unique references devices(id),
     switch_led              boolean not null,
     work_mode               varchar not null,
     temperature             int not null,

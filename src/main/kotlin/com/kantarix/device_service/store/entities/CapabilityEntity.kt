@@ -1,16 +1,19 @@
 package com.kantarix.device_service.store.entities
 
 import com.kantarix.device_service.api.dto.Capability
-import com.kantarix.device_service.api.dto.capability.CapabilityCode
 import com.kantarix.device_service.api.dto.capability.ColorHSV
-import com.kantarix.device_service.api.dto.capability.WorkMode
+import com.kantarix.device_service.api.enums.CapabilityCode
+import com.kantarix.device_service.api.enums.WorkMode
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.EnumType
 import javax.persistence.Enumerated
 import javax.persistence.FetchType
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.JoinColumn
+import javax.persistence.MapsId
 import javax.persistence.OneToOne
 import javax.persistence.Table
 
@@ -19,28 +22,30 @@ import javax.persistence.Table
 class CapabilityEntity(
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "device_id")
     var deviceId: Int,
 
-    val switchLed: Boolean,
+    var switchLed: Boolean = false,
 
     @Enumerated(EnumType.STRING)
-    val workMode: WorkMode,
+    var workMode: WorkMode = WorkMode.WHITE,
 
-    val temperature: Int,
+    var temperature: Int = 0,
 
-    val brightness: Int,
+    var brightness: Int = 10,
 
-    val colorHue: Int?,
-    val colorSaturation: Int?,
-    val colorValue: Int?,
+    var colorHue: Int? = null,
+    var colorSaturation: Int? = null,
+    var colorValue: Int? = null,
 
     @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
     @JoinColumn(name = "device_id")
     val device: DeviceEntity,
 
-) {
-    fun toCapabilitiesList() =
+    ) {
+    fun toCapabilityDtoList() =
         listOf(
             toSwitchLedCapability(),
             toWorkModeCapability(),
@@ -51,31 +56,31 @@ class CapabilityEntity(
 
     fun toSwitchLedCapability() =
         Capability(
-            code = CapabilityCode.SWITCH_LED.value,
+            code = CapabilityCode.SWITCH_LED,
             value = switchLed,
         )
 
     fun toWorkModeCapability() =
         Capability(
-            code = CapabilityCode.WORK_MODE.value,
+            code = CapabilityCode.WORK_MODE,
             value = workMode,
         )
 
     fun toTemperatureCapability() =
         Capability(
-            code = CapabilityCode.TEMPERATURE.value,
+            code = CapabilityCode.TEMPERATURE,
             value = temperature,
         )
 
     fun toBrightnessCapability() =
         Capability(
-            code = CapabilityCode.BRIGHTNESS.value,
+            code = CapabilityCode.BRIGHTNESS,
             value = brightness,
         )
 
     fun toColorCapability() =
         Capability(
-            code = CapabilityCode.COLOR.value,
+            code = CapabilityCode.COLOR,
             value = ColorHSV(hue = colorHue, saturation = colorSaturation, value = colorValue),
         )
 

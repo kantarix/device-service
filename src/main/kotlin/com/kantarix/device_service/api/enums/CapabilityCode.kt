@@ -1,4 +1,4 @@
-package com.kantarix.device_service.api.dto.capability
+package com.kantarix.device_service.api.enums
 
 import com.kantarix.device_service.api.util.BRIGHTNESS as BRIGHTNESS_VALUE
 import com.kantarix.device_service.api.util.COLOR as COLOR_VALUE

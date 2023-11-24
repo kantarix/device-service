@@ -2,6 +2,7 @@ package com.kantarix.device_service.api.dto.capability
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.kantarix.device_service.api.enums.CapabilityCode
 import com.kantarix.device_service.api.util.BRIGHTNESS
 import com.kantarix.device_service.api.util.COLOR
 import com.kantarix.device_service.api.util.SWITCH_LED
