@@ -42,14 +42,18 @@ class CapabilityService(
     @Transactional
     fun editDeviceCapabilities(deviceId: Int, deviceCapabilities: DeviceCapabilitiesRequest): List<Capability> =
         capabilityRepository.findByIdOrNull(deviceId)
-            ?.apply { editCapabilities(deviceCapabilities.capabilities) }
-            ?.also {
-                val tuyaId = it.device.tuyaId
+            ?.also { it.editCapabilities(deviceCapabilities.capabilities) }
+            ?.let { capability ->
                 deviceCapabilities.capabilities
                     .map { tuyaConverters[it.code]?.convert(it) ?: throw IllegalArgumentException() }
-                    .let { deviceConnector.sendCommand(tuyaId, CommandsRequest(commands = it)) }
+                    .let { deviceConnector.sendCommand(capability.device.tuyaId, CommandsRequest(commands = it)) }
+                    .let {
+                        if (it)
+                            capabilityRepository.save(capability)
+                        else
+                            throw ApiError.TUYA_COMMAND_NOT_SUCCEED.toException()
+                    }
             }
-            ?.let { capabilityRepository.save(it) }
             ?.toCapabilityDtoList()
             ?: throw ApiError.CAPABILITIES_NOT_FOUND.toException()
 

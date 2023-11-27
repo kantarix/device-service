@@ -18,6 +18,6 @@ public interface DeviceConnector {
     CapabilitiesResponse getDeviceCapabilities(@Path("deviceId") String deviceId, @Query("codes") String codes);
 
     @POST("/v1.0/iot-03/devices/{deviceId}/commands")
-    Object sendCommand(@Path("deviceId") String deviceId, @Body CommandsRequest commands);
+    Boolean sendCommand(@Path("deviceId") String deviceId, @Body CommandsRequest commands);
 
 }

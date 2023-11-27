@@ -22,6 +22,10 @@ enum class ApiError(
         HttpStatus.NOT_FOUND,
         "apiErrors.TUYA_DEVICE_NOT_FOUND"
     ),
+    TUYA_COMMAND_NOT_SUCCEED(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        "apiErrors.TUYA_COMMAND_NOT_SUCCEED"
+    ),
     ;
 
     fun toException() =
