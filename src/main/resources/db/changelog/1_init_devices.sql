@@ -6,6 +6,9 @@ create table devices
 (
     id                      int not null generated always as identity,
     tuya_id                 varchar not null unique,
+    owner_id                int not null,
+    home_id                 int not null,
+    room_id                 int,
     name                    varchar not null,
     category                varchar not null,
     primary key (id)

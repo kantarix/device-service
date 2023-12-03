@@ -11,4 +11,6 @@ interface DeviceRepository : JpaRepository<DeviceEntity, Int> {
 
     fun findByTuyaId(tuyaId: String): DeviceEntity?
 
+    fun findAllByOwnerId(ownerId: Int): List<DeviceEntity>
+
 }

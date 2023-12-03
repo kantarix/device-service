@@ -1,5 +1,5 @@
 server:
-  port: 5000
+  port: 5003
 
 spring:
   datasource:
@@ -23,3 +23,8 @@ connector:
   region: EU
   ak: ${ACCESS_ID}
   sk: ${ACCESS_SECRET}
+
+springdoc:
+  swagger-ui:
+    enabled: true
+  show-actuator: false

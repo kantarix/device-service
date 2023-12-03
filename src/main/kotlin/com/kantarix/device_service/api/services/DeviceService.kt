@@ -3,8 +3,8 @@ package com.kantarix.device_service.api.services
 import com.kantarix.device_service.api.dto.Device
 import com.kantarix.device_service.api.dto.DeviceSimple
 import com.kantarix.device_service.api.dto.request.DeviceCapabilitiesRequest
-import com.kantarix.device_service.api.dto.request.DeviceRequest
-import com.kantarix.device_service.api.dto.request.TuyaDeviceRequest
+import com.kantarix.device_service.api.dto.request.EditDeviceRequest
+import com.kantarix.device_service.api.dto.request.CreateDeviceRequest
 import com.kantarix.device_service.api.exceptions.ApiError
 import com.kantarix.device_service.api.repositories.DeviceRepository
 import com.kantarix.device_service.api.tuya.DeviceConnector
@@ -24,8 +24,9 @@ class DeviceService(
 ) {
 
     @Transactional(readOnly = true)
-    fun getDevices(): List<DeviceSimple> =
-        deviceRepository.findAll().map { it.toDeviceSimpleDto() }
+    fun getDevices(ownerId: Int): List<DeviceSimple> =
+        deviceRepository.findAllByOwnerId(ownerId)
+            .map { it.toDeviceSimpleDto() }
 
     @Transactional(readOnly = true)
     fun getDevice(deviceId: Int) =
@@ -34,20 +35,24 @@ class DeviceService(
         ?: throw ApiError.DEVICE_NOT_FOUND.toException()
 
     @Transactional
-    fun createDevice(tuyaDevice: TuyaDeviceRequest): Device =
-        deviceRepository.findByTuyaId(tuyaDevice.tuyaDeviceId)
+    fun createDevice(ownerId: Int, deviceRequest: CreateDeviceRequest): Device =
+        deviceRepository.findByTuyaId(deviceRequest.tuyaDeviceId)
             ?.let { throw ApiError.DEVICE_ALREADY_EXIST.toException() }
-            ?: try { deviceConnector.getDeviceInfo(tuyaDevice.tuyaDeviceId) }
+            ?: try { deviceConnector.getDeviceInfo(deviceRequest.tuyaDeviceId) }
             catch (e: ConnectorResultException) { throw ApiError.TUYA_DEVICE_NOT_FOUND.toException() }
-                .toEntity(name = tuyaDevice.name)
+                .toEntity(ownerId = ownerId, device = deviceRequest)
                 .also { it.capabilities = capabilityService.createDeviceCapabilities(it.id, it.tuyaId, it) }
                 .let { deviceRepository.save(it) }
                 .toDeviceDto()
 
     @Transactional
-    fun editDevice(deviceId: Int, device: DeviceRequest): Device =
+    fun editDevice(deviceId: Int, deviceRequest: EditDeviceRequest): Device =
         deviceRepository.findByIdOrNull(deviceId)
-            ?.apply { name = device.name }
+            ?.apply {
+                name = deviceRequest.name
+                homeId = deviceRequest.homeId ?: this.homeId
+                roomId = deviceRequest.roomId
+            }
             ?.let { deviceRepository.save(it) }
             ?.toDeviceDto()
             ?: throw ApiError.DEVICE_NOT_FOUND.toException()
@@ -62,11 +67,23 @@ class DeviceService(
             ?.let { deviceRepository.deleteById(deviceId) }
             ?: throw ApiError.DEVICE_NOT_FOUND.toException()
 
-    private fun DeviceResponse.toEntity(id: Int = -1, name: String?) =
+    @Transactional(readOnly = true)
+    fun checkOwnership(deviceId: Int, ownerId: Int): Boolean =
+        deviceRepository.findByIdOrNull(deviceId)
+            ?.checkIsAccessAllowed(ownerId)
+            ?: throw ApiError.DEVICE_NOT_FOUND.toException()
+
+    fun DeviceEntity.checkIsAccessAllowed(ownerId: Int) =
+        this.ownerId == ownerId
+
+    private fun DeviceResponse.toEntity(ownerId: Int, device: CreateDeviceRequest, id: Int = -1) =
         DeviceEntity (
             id = id,
             tuyaId = this.id,
-            name = name ?: this.name,
+            ownerId = ownerId,
+            homeId = device.homeId,
+            roomId = device.roomId,
+            name = device.name ?: this.name,
             category = this.category.toDeviceCategory() ?: throw IllegalArgumentException(),
         )
 

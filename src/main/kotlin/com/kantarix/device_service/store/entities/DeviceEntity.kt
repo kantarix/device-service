@@ -26,6 +26,12 @@ class DeviceEntity(
 
     val tuyaId: String,
 
+    val ownerId: Int,
+
+    var homeId: Int,
+
+    var roomId: Int?,
+
     var name: String,
 
     @Enumerated(EnumType.STRING)
@@ -44,6 +50,8 @@ class DeviceEntity(
     fun toDeviceDto() =
         Device(
             id = id,
+            homeId = homeId,
+            roomId = roomId,
             name = name,
             category = category.value,
             capabilities = capabilities?.toCapabilityDtoList()
@@ -53,6 +61,8 @@ class DeviceEntity(
     fun toDeviceSimpleDto() =
         DeviceSimple(
             id = id,
+            homeId = homeId,
+            roomId = roomId,
             name = name,
             category = category.value,
         )
