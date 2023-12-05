@@ -2,9 +2,9 @@ package com.kantarix.device_service.api.services
 
 import com.kantarix.device_service.api.dto.Device
 import com.kantarix.device_service.api.dto.DeviceSimple
+import com.kantarix.device_service.api.dto.request.CreateDeviceRequest
 import com.kantarix.device_service.api.dto.request.DeviceCapabilitiesRequest
 import com.kantarix.device_service.api.dto.request.EditDeviceRequest
-import com.kantarix.device_service.api.dto.request.CreateDeviceRequest
 import com.kantarix.device_service.api.exceptions.ApiError
 import com.kantarix.device_service.api.repositories.DeviceRepository
 import com.kantarix.device_service.api.tuya.DeviceConnector
@@ -50,7 +50,7 @@ class DeviceService(
         deviceRepository.findByIdOrNull(deviceId)
             ?.apply {
                 name = deviceRequest.name
-                homeId = deviceRequest.homeId ?: this.homeId
+                homeId = deviceRequest.homeId
                 roomId = deviceRequest.roomId
             }
             ?.let { deviceRepository.save(it) }
@@ -66,6 +66,20 @@ class DeviceService(
         deviceRepository.findByIdOrNull(deviceId)
             ?.let { deviceRepository.deleteById(deviceId) }
             ?: throw ApiError.DEVICE_NOT_FOUND.toException()
+
+    @Transactional
+    fun deleteDevicesByHomeId(homeId: Int) =
+        deviceRepository.deleteAllByHomeId(homeId)
+
+    @Transactional
+    fun clearRoomsByRoomId(roomId: Int) {
+        deviceRepository.findAllByRoomId(roomId)
+            .map {
+                it.roomId = null
+                it
+            }
+            .let { deviceRepository.saveAll(it) }
+    }
 
     @Transactional(readOnly = true)
     fun checkOwnership(deviceId: Int, ownerId: Int): Boolean =

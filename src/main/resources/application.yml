@@ -2,6 +2,8 @@ server:
   port: 5003
 
 spring:
+  application:
+    name: device_service
   datasource:
     url: jdbc:postgresql://localhost:5432/device_service_db
     username: postgres
@@ -16,6 +18,8 @@ spring:
   liquibase:
     change-log: classpath:/db/changelog.yml
     enabled: true
+  kafka:
+    bootstrap-servers: localhost:9092
   messages:
     basename: messages
 

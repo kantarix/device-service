@@ -13,4 +13,8 @@ interface DeviceRepository : JpaRepository<DeviceEntity, Int> {
 
     fun findAllByOwnerId(ownerId: Int): List<DeviceEntity>
 
+    fun findAllByRoomId(roomId: Int): List<DeviceEntity>
+
+    fun deleteAllByHomeId(homeId: Int)
+
 }

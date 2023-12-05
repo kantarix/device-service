@@ -2,9 +2,9 @@ package com.kantarix.device_service.api.controllers
 
 import com.kantarix.device_service.api.dto.Device
 import com.kantarix.device_service.api.dto.DeviceSimple
+import com.kantarix.device_service.api.dto.request.CreateDeviceRequest
 import com.kantarix.device_service.api.dto.request.DeviceCapabilitiesRequest
 import com.kantarix.device_service.api.dto.request.EditDeviceRequest
-import com.kantarix.device_service.api.dto.request.CreateDeviceRequest
 import com.kantarix.device_service.api.services.DeviceService
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.validation.annotation.Validated
